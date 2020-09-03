@@ -1,3 +1,5 @@
+import contacts from '../js/one'
+
 BX24.init(() => {
     // BX24.callMethod(
     //     "crm.deal.list",
@@ -17,16 +19,7 @@ BX24.init(() => {
     //         }
     //     }
     // );
-    BX24.callMethod(
-        "crm.contact.get",
-        {id: 2},
-        function (result) {
-            if (result.error())
-                console.error(result.error());
-            else
-                console.dir(result.data());
-        }
-    );
+
 
     BX24.callMethod(
         "crm.deal.list",
@@ -44,4 +37,5 @@ BX24.init(() => {
             }
         }
     );
+    console.log(contacts)
 });
