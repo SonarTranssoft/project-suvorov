@@ -1,68 +1,21 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="ru">
 <head>
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
-    <meta charset="utf-8">
-    <title>Marker Clustering</title>
-    <style>
-        /* Always set the map height explicitly to define the size of the div
-         * element that contains the map. */
-        #map {
-            height: 100%;
-        }
-        /* Optional: Makes the sample page fill the window. */
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-    </style>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
 </head>
-<script src="//api.bitrix24.com/api/v1/"></script>
 <body>
-<div id="map"></div>
-<!--<script>-->
-<!--    function initMap() {-->
 
-<!--        let map = new google.maps.Map(document.getElementById('map'), {-->
-<!--            zoom: 3,-->
-<!--            center: { lat: 51.392242, lng: 30.0846125}-->
-<!--        });-->
+<script type="text/javascript" src="js/main.js"></script>
+<script src="//api.bitrix24.com/api/v1/"></script>
+<script>
+        BX24.init(function(){
+            let a = displayCurrentUser()
+            console.log(...a);
+        });
+</script>
 
-<!--        // Create an array of alphabetical characters used to label the markers.-->
-<!--        let labels = ['Припять', 'Выжигатель мозгов'];-->
-<!--        // Add some markers to the map.-->
-<!--        // Note: The code uses the JavaScript Array.prototype.map() method to-->
-<!--        // create an array of markers based on a given "locations" array.-->
-<!--        // The map() method here has nothing to do with the Google Maps API.-->
-<!--        let markers = locations.map(function(location, i) {-->
-<!--            return new google.maps.Marker({-->
-<!--                position: location,-->
-<!--                label: labels[i % labels.length]-->
-<!--            });-->
-<!--        });-->
-
-<!--        // Add a marker clusterer to manage the markers.-->
-<!--        let markerCluster = new MarkerClusterer(map, markers, {imagePath:-->
-<!--                'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});-->
-<!--    }-->
-<!--    let locations = [-->
-<!--        {lat: 51.4066963, lng: 30.0361972},-->
-<!--        {lat: 51.388555, lng: 30.098767},-->
-
-<!--    ];-->
-<!--    BX24.init(function(){-->
-<!--        console.log('Инициализация завершена!', BX24.isAdmin());-->
-<!--        initMap();-->
-
-<!--    });-->
-<!--</script>-->
-<!--&lt;!&ndash; Replace following script src &ndash;&gt;-->
-<!--<script src="https://unpkg.com/@google/markerclustererplus@5.1.0/dist/markerclustererplus.min.js"></script>-->
-<!--</script>-->
-<!--<script defer-->
-<!--src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASzH9y5Yara69z3gffsfNPJht1z93Kn9o&callback=initMap"></script>-->
-
-<script src="js/main.js"></script>
 </body>
 </html>
