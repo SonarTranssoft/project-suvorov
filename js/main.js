@@ -1,4 +1,12 @@
-function displayCurrentUser() {
+class Place {
+    constructor(lat, long) {
+        this.lat = lat;
+        this.long = long
+    }
+}
+
+
+function getCoordinatesFromDeals() {
     let arr = [];
     BX24.callMethod(
         "crm.deal.list",
@@ -11,7 +19,11 @@ function displayCurrentUser() {
                 console.error(result.error());
             else {
                 result.data().forEach(el => {
-                    arr.push(el.UF_CRM_1598808869287);
+                    let dealIncompleteAddress = (el.UF_CRM_1598808869287);
+                    let invalidCoordinates = dealIncompleteAddress.split('|');
+                    let destination = invalidCoordinates[1].split(';');
+                    let place = new Place(destination[0], destination[1]);
+                    arr.push(place)
                 })
                 if (result.more())
                     result.next();
@@ -20,3 +32,15 @@ function displayCurrentUser() {
     );
     return arr;
 }
+
+// function getLocations(array) {
+//     let placesForMap = [];
+//     array.forEach(el => {
+//         let invalidCoordinates = el.split('|');
+//         let destination = invalidCoordinates[1].split(';');
+//         let place = new Place(destination[0], destination[1]);
+//         placesForMap.push(place);
+//     });
+//     return placesForMap;
+// }
+
