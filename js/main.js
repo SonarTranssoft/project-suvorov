@@ -33,6 +33,16 @@ function getCoordinatesFromDeals() {
     return arr;
 }
 
+function initMap() {
+    // The location of Uluru
+    let region = {lat: 55.7301636, lng: 72.691498};
+    // The map, centered at Uluru
+    let map = new google.maps.Map(
+        document.getElementById('map'), {zoom: 4, center: region});
+    // The marker, positioned at Uluru
+    let marker = new google.maps.Marker({position: region, map: map});
+}
+
 // function getLocations(array) {
 //     let placesForMap = [];
 //     array.forEach(el => {
