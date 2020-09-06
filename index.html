@@ -5,22 +5,19 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/index.css">
+    <script type="text/javascript" src="js/main.js"></script>
+    <script src="//api.bitrix24.com/api/v1/"></script>
 </head>
 <body>
 <div id="map"></div>
-<script type="text/javascript" src="js/main.js"></script>
-<script src="//api.bitrix24.com/api/v1/"></script>
 
-<script>
+
+<script async>
     BX24.init(function () {
-        let arrayOfDeals = getCoordinatesFromDeals()
+        let arrayOfDeals = getCoordinatesFromDeals();
         console.log(arrayOfDeals);
-
-
+        include('https://maps.googleapis.com/maps/api/js?key=AIzaSyASzH9y5Yara69z3gffsfNPJht1z93Kn9o&callback=initMap');
     });
-</script>
-<script defer
-        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyASzH9y5Yara69z3gffsfNPJht1z93Kn9o&callback=initMap">
 </script>
 </body>
 </html>

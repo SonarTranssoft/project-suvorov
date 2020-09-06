@@ -43,6 +43,14 @@ function initMap() {
     let marker = new google.maps.Marker({position: region, map: map});
 }
 
+function include(url) {
+    let script = document.createElement('script');
+    script.setAttribute('defer', '');
+    script.src = url;
+    let scripts = document.getElementsByTagName('body');
+    scripts[0].appendChild(script);
+}
+
 // function getLocations(array) {
 //     let placesForMap = [];
 //     array.forEach(el => {
