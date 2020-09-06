@@ -5,6 +5,12 @@ class Place {
     }
 }
 
+// var locations = []
+var locations = [
+    {lat: "54.984951", long: "73.4012343"},
+    {lat: "54.9991464", long: "73.3605812"},
+    {lat: "55.0225655", long: "73.31209559999999"}
+    ];
 
 function getCoordinatesFromDeals() {
     let arr = [];
@@ -34,13 +40,26 @@ function getCoordinatesFromDeals() {
 }
 
 function initMap() {
+
     // The location of Uluru
     let region = {lat: 55.7301636, lng: 72.691498};
     // The map, centered at Uluru
     let map = new google.maps.Map(
         document.getElementById('map'), {zoom: 4, center: region});
     // The marker, positioned at Uluru
-    let marker = new google.maps.Marker({position: region, map: map});
+    // let marker = new google.maps.Marker({position: region, map: map});
+
+    let labels = 'ABC';
+    let markers = locations.map(function(location, i) {
+        return new google.maps.Marker({
+            position: location,
+            label: labels[i % labels.length]
+        });
+    });
+
+    // Add a marker clusterer to manage the markers.
+    let markerCluster = new MarkerClusterer(map, markers,
+        {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 }
 
 function include(url) {
