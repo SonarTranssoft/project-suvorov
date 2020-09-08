@@ -6,6 +6,7 @@ class Place {
 }
 
 // var locations = []
+//Global array to set markers into a map
 var locations = [
     {lat: "54.984951", long: "73.4012343"},
     {lat: "54.9991464", long: "73.3605812"},
