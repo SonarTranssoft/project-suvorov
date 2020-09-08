@@ -36,6 +36,9 @@ function getCoordinatesFromDeals() {
             }
         }
     );
+    BX24.callMethod('crm.deals.list', {}, (result) =>{
+        
+    });
     return arr;
 }
 
