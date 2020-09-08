@@ -1,17 +1,17 @@
 class Place {
     constructor(lat, long) {
         this.lat = lat;
-        this.long = long
+        this.lng = long
     }
 }
 
 // var locations = []
 //Global array to set markers into a map
 var locations = [
-    {lat: "54.984951", long: "73.4012343"},
-    {lat: "54.9991464", long: "73.3605812"},
-    {lat: "55.0225655", long: "73.31209559999999"}
-    ];
+    {lat: 54.984951, lng: 73.4012343},
+    {lat: 54.9991464, lng: 73.3605812},
+    {lat: 55.0225655, lng: 73.31209559999999}
+];
 
 function getCoordinatesFromDeals() {
     let arr = [];
@@ -29,7 +29,7 @@ function getCoordinatesFromDeals() {
                     let dealIncompleteAddress = (el.UF_CRM_1598808869287);
                     let invalidCoordinates = dealIncompleteAddress.split('|');
                     let destination = invalidCoordinates[1].split(';');
-                    let place = new Place(destination[0], destination[1]);
+                    let place = new Place(parseFloat(destination[0]), parseFloat(destination[1]));
                     arr.push(place)
                 })
                 if (result.more())
@@ -51,7 +51,7 @@ function initMap() {
     // let marker = new google.maps.Marker({position: region, map: map});
 
     let labels = 'ABC';
-    let markers = locations.map(function(location, i) {
+    let markers = locations.map(function (location, i) {
         return new google.maps.Marker({
             position: location,
             label: labels[i % labels.length]
