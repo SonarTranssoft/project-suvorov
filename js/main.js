@@ -1,18 +1,7 @@
-class Place {
-    constructor(lat, long) {
-        this.lat = lat;
-        this.lng = long
-    }
-}
-
-// var locations = []
-var locations = [
-    {lat: 54.984951, lng: 73.4012343},
-    {lat: 54.9991464, lng: 73.3605812},
-    {lat: 55.0225655, lng: 73.31209559999999}
-];
+var locations = []
 
 function getCoordinatesFromDeals() {
+    console.log('Начинаем обращаться к битриксу')
     let arr = [];
     BX24.callMethod(
         "crm.deal.list",
@@ -28,38 +17,44 @@ function getCoordinatesFromDeals() {
                     let dealIncompleteAddress = (el.UF_CRM_1598808869287);
                     let invalidCoordinates = dealIncompleteAddress.split('|');
                     let destination = invalidCoordinates[1].split(';');
-                    let place = new Place(parseFloat(destination[0]), parseFloat(destination[1]));
-                    arr.push(place)
+                    let latLng = {lat: parseFloat(destination[0]), lng: parseFloat(destination[1])};
+                    arr.push(latLng);
                 })
                 if (result.more())
                     result.next();
             }
+
         }
-    );
+    )
+    console.log('Массив получен, возвращаем данные');
     return arr;
 }
 
 function initMap() {
 
-    // The location of Uluru
+    console.log('Инициализация карты началась')
     let region = {lat: 55.7301636, lng: 72.691498};
-    // The map, centered at Uluru
+
     let map = new google.maps.Map(
         document.getElementById('map'), {zoom: 4, center: region});
-    // The marker, positioned at Uluru
-    // let marker = new google.maps.Marker({position: region, map: map});
+    console.log('маркеры перед вставкой', locations)
+    locations.forEach(el => {
+        console.log(el);
+        let marker = new google.maps.Marker({position: el, map: map})
+    })
+    // let markers = locations.map(function (location, i) {
+    //     return new google.maps.Marker({
+    //         position: {lat: 55.7301636, lng: 72.691498},
+    //         label: i.toString()
+    //     });
+    // });
+    // console.log(markers);
+    //
+    // let markerCluster = new MarkerClusterer(map, markers,
+    //     {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 
-    let labels = 'ABC';
-    let markers = locations.map(function (location, i) {
-        return new google.maps.Marker({
-            position: location,
-            label: labels[i % labels.length]
-        });
-    });
+    console.log('Функция сработала');
 
-    // Add a marker clusterer to manage the markers.
-    let markerCluster = new MarkerClusterer(map, markers,
-        {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 }
 
 function include(url) {
@@ -68,7 +63,9 @@ function include(url) {
     script.src = url;
     let scripts = document.getElementsByTagName('body');
     scripts[0].appendChild(script);
+    console.log('Скрипт смонтирован')
 }
+
 
 // function getLocations(array) {
 //     let placesForMap = [];
