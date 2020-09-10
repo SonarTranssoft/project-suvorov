@@ -7,11 +7,11 @@ class Place {
 
 // var locations = []
 //Global array to set markers into a map
-var locations = [
-    {lat: 54.984951, lng: 73.4012343},
-    {lat: 54.9991464, lng: 73.3605812},
-    {lat: 55.0225655, lng: 73.31209559999999}
-];
+// var locations = [
+//     {lat: 54.984951, lng: 73.4012343},
+//     {lat: 54.9991464, lng: 73.3605812},
+//     {lat: 55.0225655, lng: 73.31209559999999}
+// ];
 
 function getCoordinatesFromDeals() {
     let arr = [];
@@ -47,16 +47,15 @@ function initMap() {
     // The map, centered at Uluru
     let map = new google.maps.Map(
         document.getElementById('map'), {zoom: 4, center: region});
-    // The marker, positioned at Uluru
-    // let marker = new google.maps.Marker({position: region, map: map});
-
     let labels = 'ABC';
+    console.log('Массив будущих маркеров', locations);
     let markers = locations.map(function (location, i) {
         return new google.maps.Marker({
             position: location,
-            label: labels[i % labels.length]
+            label: labels[i]
         });
     });
+    console.log(markers);
 
     // Add a marker clusterer to manage the markers.
     let markerCluster = new MarkerClusterer(map, markers,
@@ -81,4 +80,3 @@ function include(url) {
 //     });
 //     return placesForMap;
 // }
-
