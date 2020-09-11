@@ -14,29 +14,19 @@
 
 <script async>
     var locations = [];
-    include('https://maps.googleapis.com/maps/api/js?key=AIzaSyASzH9y5Yara69z3gffsfNPJht1z93Kn9o&callback=initMap');
     BX24.init(function () {
         let promise = new Promise(resolve => {
             console.log('Началось')
-            resolve(() => {
-                console.log('Запускаем карту')
-                include('https://maps.googleapis.com/maps/api/js?key=AIzaSyASzH9y5Yara69z3gffsfNPJht1z93Kn9o&callback=initMap')
-
-            })
+            include('https://maps.googleapis.com/maps/api/js?key=AIzaSyBOXjzORCt4qtazCEkxJqXyajzsMnUcnyU&callback=initMap')
+            console.log('Запускаем карту')
+            let resData = getCoordinatesFromDeals()
+            resolve(resData)
         })
-        promise.then(locations = getCoordinatesFromDeals())
-        // promise.then(data => {
-        //     console.log('Длина до присваивания', locations.length)
-        //     locations = data;
-        //     console.log('Длина после присваивания', locations.length)
+        promise.then(data => {
+            console.log('Длина до присваивания', locations.length)
+            locations = data;
         })
     })
-    // BX24.init(function () {
-    //
-    //     // var arrayOfDeals = getCoordinatesFromDeals();
-    //     // console.log(arrayOfDeals);
-    //     // locations = arrayOfDeals;
-    // });
 </script>
 <script src="https://unpkg.com/@google/markerclustererplus@5.1.0/dist/markerclustererplus.min.js"></script>
 </body>
