@@ -1,9 +1,3 @@
-class Place {
-    constructor(lat, long) {
-        this.lat = lat;
-        this.lng = long
-    }
-}
 
 // var locations1 = [{lat: 54.984951, lng: 73.4012343},
 // {lat: 54.9991464, lng: 73.3605812},
@@ -53,14 +47,13 @@ function initMap() {
             position: location,
         });
     });
-    console.log(markers);
 
     // Add a marker clusterer to manage the markers.
     let markerCluster = new MarkerClusterer(map, markers,
         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
 }
-var locations = [
-];
+
+var locations = [];
 
 function include(url) {
     let script = document.createElement('script');
