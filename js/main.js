@@ -35,12 +35,9 @@ function getCoordinatesFromDeals() {
                 } else {
                     return res(arr);
                 }
-
             }
         );
-
     });
-
 }
 
 async function initMap() {
@@ -56,36 +53,41 @@ async function initMap() {
 
     // создаем экземпляр карты
     const map = new google.maps.Map(
-        document.getElementById('map'), {zoom: 10}
+        document.getElementById('map'), {zoom: 6}
     );
 
     // let labels = 'ABC';
     console.log(`На карте будет ${coordinates.length} маркеров`);
+    // const infowindow = new google.maps.InfoWindow({
+    //     content: 'Hello Moto!'
+    // });
 
     const markers = coordinates.map((_pos) => new google.maps.Marker({position: _pos}));
+
 
     console.log(markers);
 
     // импровизированное центрование отметок
-    if (Array.isArray(markers) && markers.length) {
-        const avg = markers.reduce((prev, cur) => [prev[0] + cur.position.lat(), prev[1] + cur.position.lng()], [0,0]);
-
-        map.setCenter({
-            lat: avg[0] / markers.length,
-            lng: avg[1] / markers.length,
-        });
-    }
+    // if (Array.isArray(markers) && markers.length) {
+    //     const avg = markers.reduce((prev, cur) => [prev[0] + cur.position.lat(), prev[1] + cur.position.lng()], [0, 0]);
+    //
+    //     map.setCenter({
+    //         lat: avg[0] / markers.length,
+    //         lng: avg[1] / markers.length,
+    //     });
+    // }
 
 
     // Add a marker clusterer to manage the markers.
     const markerCluster = new MarkerClusterer(
-        map, 
-        markers, 
+        map,
+        markers,
         {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'}
     );
+
 }
-var locations = [
-];
+
+var locations = [];
 
 function include(url) {
     let script = document.createElement('script');
@@ -94,3 +96,5 @@ function include(url) {
     let scripts = document.getElementsByTagName('body');
     scripts[0].appendChild(script);
 }
+
+
