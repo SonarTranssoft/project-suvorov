@@ -5,65 +5,89 @@ class Place {
     }
 }
 
-// var locations = []
-var locations = [
-    {lat: 54.984951, lng: 73.4012343},
-    {lat: 54.9991464, lng: 73.3605812},
-    {lat: 55.0225655, lng: 73.31209559999999}
-];
-
 function getCoordinatesFromDeals() {
-    let arr = [];
-    BX24.callMethod(
-        "crm.deal.list",
-        {
-            order: {"STAGE_ID": "ASC"},
-            select: ["ID", "TITLE", "STAGE_ID", "PROBABILITY", "OPPORTUNITY", "CURRENCY_ID", "UF_*"]
-        },
-        function (result) {
-            if (result.error())
-                console.error(result.error());
-            else {
+    const arr = [];
+
+    return new Promise(res => {
+
+        BX24.callMethod(
+            "crm.deal.list",
+            {
+                order: {"STAGE_ID": "ASC"},
+                select: ["ID", "TITLE", "STAGE_ID", "PROBABILITY", "OPPORTUNITY", "CURRENCY_ID", "UF_*"]
+            },
+            function (result) {
+                if (result.error()) {
+                    // выбрасываем ошибку #{1}
+                    throw new Error(result.error())
+                }
+
                 result.data().forEach(el => {
                     let dealIncompleteAddress = (el.UF_CRM_1598808869287);
                     let invalidCoordinates = dealIncompleteAddress.split('|');
                     let destination = invalidCoordinates[1].split(';');
-                    let place = new Place(parseFloat(destination[0]), parseFloat(destination[1]));
+                    let place = new Place(parseFloat(destination[0]), parseFloat(destination[1]))
                     arr.push(place)
                 })
-                if (result.more())
+
+                if (result.more()) {
                     result.next();
+                } else {
+                    return res(arr);
+                }
             }
-        }
-    );
-    BX24.callMethod('crm.deals.list', {}, (result) =>{
-        
+        );
     });
-    return arr;
 }
 
-function initMap() {
+async function initMap() {
 
-    // The location of Uluru
-    let region = {lat: 55.7301636, lng: 72.691498};
-    // The map, centered at Uluru
-    let map = new google.maps.Map(
-        document.getElementById('map'), {zoom: 4, center: region});
-    // The marker, positioned at Uluru
-    // let marker = new google.maps.Marker({position: region, map: map});
+    let coordinates;
 
-    let labels = 'ABC';
-    let markers = locations.map(function (location, i) {
-        return new google.maps.Marker({
-            position: location,
-            label: labels[i % labels.length]
-        });
-    });
+    try {
+        coordinates = await getCoordinatesFromDeals();
+    } catch (e) {
+        // тут обрабатываем ошибку #{1}
+        return console.error(e);
+    }
+
+    // создаем экземпляр карты
+    const map = new google.maps.Map(
+        document.getElementById('map'), {zoom: 6}
+    );
+
+    // let labels = 'ABC';
+    console.log(`На карте будет ${coordinates.length} маркеров`);
+    // const infowindow = new google.maps.InfoWindow({
+    //     content: 'Hello Moto!'
+    // });
+
+    const markers = coordinates.map((_pos) => new google.maps.Marker({position: _pos}));
+
+
+    console.log(markers);
+
+    // импровизированное центрование отметок
+    // if (Array.isArray(markers) && markers.length) {
+    //     const avg = markers.reduce((prev, cur) => [prev[0] + cur.position.lat(), prev[1] + cur.position.lng()], [0, 0]);
+    //
+    //     map.setCenter({
+    //         lat: avg[0] / markers.length,
+    //         lng: avg[1] / markers.length,
+    //     });
+    // }
+
 
     // Add a marker clusterer to manage the markers.
-    let markerCluster = new MarkerClusterer(map, markers,
-        {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'});
+    const markerCluster = new MarkerClusterer(
+        map,
+        markers,
+        {imagePath: 'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m'}
+    );
+
 }
+
+var locations = [];
 
 function include(url) {
     let script = document.createElement('script');
@@ -73,14 +97,4 @@ function include(url) {
     scripts[0].appendChild(script);
 }
 
-// function getLocations(array) {
-//     let placesForMap = [];
-//     array.forEach(el => {
-//         let invalidCoordinates = el.split('|');
-//         let destination = invalidCoordinates[1].split(';');
-//         let place = new Place(destination[0], destination[1]);
-//         placesForMap.push(place);
-//     });
-//     return placesForMap;
-// }
 
