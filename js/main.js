@@ -1,11 +1,26 @@
 class Place {
     constructor(lat, long) {
         this.lat = lat;
-        this.lng = long
+        this.lng = long;
     }
 }
 
-function getCoordinatesFromDeals() {
+class Deal {
+    constructor(id, stage, title, place) {
+        this.id = id;
+        this.stage = stage;
+        this.title = title;
+        this.place = place;
+    }
+}
+function getPlaceFromDeal(str) {
+    let dealIncompleteAddress = (str);
+    let invalidCoordinates = dealIncompleteAddress.split('|');
+    let destination = invalidCoordinates[1].split(';');
+    return new Place(parseFloat(destination[0]), parseFloat(destination[1]));
+}
+
+function getDeals() {
     const arr = [];
 
     return new Promise(res => {
@@ -14,7 +29,7 @@ function getCoordinatesFromDeals() {
             "crm.deal.list",
             {
                 order: {"STAGE_ID": "ASC"},
-                select: ["ID", "TITLE", "STAGE_ID", "PROBABILITY", "OPPORTUNITY", "CURRENCY_ID", "UF_*"]
+                select: ["ID", "TITLE", "STAGE_ID", "UF_*"]
             },
             function (result) {
                 if (result.error()) {
@@ -23,16 +38,17 @@ function getCoordinatesFromDeals() {
                 }
 
                 result.data().forEach(el => {
-                    let dealIncompleteAddress = (el.UF_CRM_1598808869287);
-                    let invalidCoordinates = dealIncompleteAddress.split('|');
-                    let destination = invalidCoordinates[1].split(';');
-                    let place = new Place(parseFloat(destination[0]), parseFloat(destination[1]))
-                    arr.push(place)
+                    console.log(el);
+                    //получаем координаты и подготавливаем для вывода на карту
+                    let place = getPlaceFromDeal(el.UF_CRM_1598808869287);
+                    let deal = new Deal(el.ID, el.STAGE_ID, el.TITLE, place)
+                    arr.push(deal);
                 })
 
                 if (result.more()) {
                     result.next();
                 } else {
+                    console.log(arr);
                     return res(arr);
                 }
             }
@@ -42,10 +58,14 @@ function getCoordinatesFromDeals() {
 
 async function initMap() {
 
+    let deals;
     let coordinates;
 
     try {
-        coordinates = await getCoordinatesFromDeals();
+        deals = await getDeals()
+        coordinates = deals.map(deal => {
+            return deal.place;
+        });
     } catch (e) {
         // тут обрабатываем ошибку #{1}
         return console.error(e);
@@ -68,14 +88,14 @@ async function initMap() {
     console.log(markers);
 
     // импровизированное центрование отметок
-    // if (Array.isArray(markers) && markers.length) {
-    //     const avg = markers.reduce((prev, cur) => [prev[0] + cur.position.lat(), prev[1] + cur.position.lng()], [0, 0]);
-    //
-    //     map.setCenter({
-    //         lat: avg[0] / markers.length,
-    //         lng: avg[1] / markers.length,
-    //     });
-    // }
+    if (Array.isArray(markers) && markers.length) {
+        const avg = markers.reduce((prev, cur) => [prev[0] + cur.position.lat(), prev[1] + cur.position.lng()], [0, 0]);
+
+        map.setCenter({
+            lat: avg[0] / markers.length,
+            lng: avg[1] / markers.length,
+        });
+    }
 
 
     // Add a marker clusterer to manage the markers.
@@ -86,8 +106,6 @@ async function initMap() {
     );
 
 }
-
-var locations = [];
 
 function include(url) {
     let script = document.createElement('script');
