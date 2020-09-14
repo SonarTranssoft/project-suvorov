@@ -13,25 +13,11 @@
 
 
 <script async>
-    var arrayOfDeals = [];
-
-    BX24.init(function () {
-        // arrayOfDeals = getCoordinatesFromDeals();
-        // getCoordinatesFromDeals();
-        // console.log('Битрикс заработал', arrayOfDeals);
-        let promise = new Promise(resolve => {
-            arrayOfDeals = getCoordinatesFromDeals()
-            resolve(arrayOfDeals);
-        })
-        promise.then((data) => {
-            locations = data;
-            include('https://maps.googleapis.com/maps/api/js?key=AIzaSyBOXjzORCt4qtazCEkxJqXyajzsMnUcnyU&callback=initMap');
-        })
-    });
-
-</script>
-<script async>
-
+    var locations = [];
+    BX24.init(async function () {
+        // оставляем только это, т.к. в теории initMap может загрузиться после получения координат, и метки не поставятся
+        include('https://maps.googleapis.com/maps/api/js?key=AIzaSyBOXjzORCt4qtazCEkxJqXyajzsMnUcnyU&callback=initMap');
+    })
 </script>
 <script src="https://unpkg.com/@google/markerclustererplus@5.1.0/dist/markerclustererplus.min.js"></script>
 </body>
