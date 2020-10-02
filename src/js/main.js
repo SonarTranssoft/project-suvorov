@@ -36,6 +36,7 @@ function getDeals() {
                     // выбрасываем ошибку #{1}
                     throw new Error(result.error())
                 }
+                console.log(result.data())
 
                 result.data().forEach(el => {
                     console.log(el);
@@ -63,9 +64,7 @@ async function initMap() {
 
     try {
         deals = await getDeals()
-        coordinates = deals.map(deal => {
-            return deal.place;
-        });
+        coordinates = deals.map(deal => deal.place);
     } catch (e) {
         // тут обрабатываем ошибку #{1}
         return console.error(e);
@@ -82,7 +81,12 @@ async function initMap() {
     //     content: 'Hello Moto!'
     // });
 
-    const markers = coordinates.map((_pos) => new google.maps.Marker({position: _pos}));
+    const redMarker = 'src/img/redMarker.png'
+
+    const markers = deals.map((_pos) => new google.maps.Marker({
+        position: _pos.place,
+        icon: redMarker
+    }));
 
 
     console.log(markers);
