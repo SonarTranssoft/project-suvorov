@@ -10,11 +10,13 @@ class Place {
 }
 
 class Deal {
-    constructor(id, stage, title, place) {
+    constructor(id, stage, company_id, title, place, comments) {
         this.id = id;
         this.stage = stage;
+        this.company_id = company_id;
         this.title = title;
         this.place = place;
+        this.comments = comments;
     }
 }
 
@@ -49,7 +51,7 @@ function getDeals() {
             "crm.deal.list",
             {
                 order: {"STAGE_ID": "ASC"},
-                select: ["ID", "TITLE", "STAGE_ID", "UF_*"]
+                select: ["ID", "TITLE", "STAGE_ID", "COMPANY_ID", "UF_*", "COMMENTS"]
             },
             function (result) {
                 if (result.error()) {
@@ -63,7 +65,7 @@ function getDeals() {
                     //получаем координаты и подготавливаем для вывода на карту
                     let place = getPlaceFromDeal(el.UF_CRM_1598808869287);
                     if (place) {
-                        let deal = new Deal(el.ID, el.STAGE_ID, el.TITLE, place);
+                        let deal = new Deal(el.ID, el.STAGE_ID, el.COMPANY_ID, el.TITLE, place, el.COMMENTS);
                         map.get(el.STAGE_ID).push(deal);
                     }
                 })
