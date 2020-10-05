@@ -1,3 +1,7 @@
+const FIRST_STAGE = 'NEW';
+const SECOND_STAGE = 'PREPARATION';
+const THIRD_STAGE = 'PREPAYMENT_INVOICE';
+
 class Place {
     constructor(lat, long) {
         this.lat = lat;
@@ -13,15 +17,31 @@ class Deal {
         this.place = place;
     }
 }
+
+function showCountOfDeals(arr) {
+    return arr.map(el => el.place).length;
+}
+
+function getCategoryOfDeals(str, map) {
+    let array = [];
+    return array = map.get(str);
+}
+
 function getPlaceFromDeal(str) {
-    let dealIncompleteAddress = (str);
-    let invalidCoordinates = dealIncompleteAddress.split('|');
+    if (!str || typeof str !== 'string') return null;
+    let invalidCoordinates = str.split('|');
+    if (!invalidCoordinates || invalidCoordinates.length !== 2) return null;
     let destination = invalidCoordinates[1].split(';');
-    return new Place(parseFloat(destination[0]), parseFloat(destination[1]));
+    if (isNaN(Number(destination[0])) || isNaN(Number(destination[1]))) return null;
+    return new Place(Number(destination[0]), Number(destination[1]));
 }
 
 function getDeals() {
-    const arr = [];
+    const map = new Map([
+        [FIRST_STAGE, []],
+        [SECOND_STAGE, []],
+        [THIRD_STAGE, []]
+    ]);
 
     return new Promise(res => {
 
@@ -42,15 +62,17 @@ function getDeals() {
                     console.log(el);
                     //получаем координаты и подготавливаем для вывода на карту
                     let place = getPlaceFromDeal(el.UF_CRM_1598808869287);
-                    let deal = new Deal(el.ID, el.STAGE_ID, el.TITLE, place)
-                    arr.push(deal);
+                    if (place) {
+                        let deal = new Deal(el.ID, el.STAGE_ID, el.TITLE, place);
+                        map.get(el.STAGE_ID).push(deal);
+                    }
                 })
 
                 if (result.more()) {
                     result.next();
                 } else {
-                    console.log(arr);
-                    return res(arr);
+                    console.log(map);
+                    return res(map);
                 }
             }
         );
@@ -58,14 +80,23 @@ function getDeals() {
 }
 
 async function initMap() {
-
-    let deals;
-    let coordinates;
+    const markers = [];
+    let dealsMap, newDeals, serviceDeals, plannedDeals;
+    let icon = {
+        path: "M16.734,0C9.375,0,3.408,5.966,3.408,13.325c0,11.076,13.326,20.143,13.326,20.143S30.06,23.734,30.06,13.324        " +
+            "C30.06,5.965,24.093,0,16.734,0z M16.734,19.676c-3.51,0-6.354-2.844-6.354-6.352c0-3.508,2.844-6.352,6.354-6.352        " +
+            "c3.508-0.001,6.352,2.845,6.352,6.353C23.085,16.833,20.242,19.676,16.734,19.676z",
+        fillOpacity: 0.8,
+        anchor: new google.maps.Point(16, 32)
+    };
 
     try {
-        deals = await getDeals()
-        coordinates = deals.map(deal => deal.place);
+        dealsMap = await getDeals();
+        newDeals = getCategoryOfDeals(FIRST_STAGE, dealsMap);
+        serviceDeals = getCategoryOfDeals(SECOND_STAGE, dealsMap);
+        plannedDeals = getCategoryOfDeals(THIRD_STAGE, dealsMap);
     } catch (e) {
+
         // тут обрабатываем ошибку #{1}
         return console.error(e);
     }
@@ -75,19 +106,51 @@ async function initMap() {
         document.getElementById('map'), {zoom: 6}
     );
 
-    // let labels = 'ABC';
-    console.log(`На карте будет ${coordinates.length} маркеров`);
-    // const infowindow = new google.maps.InfoWindow({
-    //     content: 'Hello Moto!'
-    // });
+    console.log(`На карте будет ${newDeals.length} новых сделок`);
+    console.log(`На карте будет ${serviceDeals.length} сервисных сделок`);
+    console.log(`На карте будет ${plannedDeals.length} запланированных сделок`);
 
-    const redMarker = 'src/img/redMarker.png'
+    let blueMarkers = newDeals.map((_pos) => {
+        return new google.maps.Marker({
+            position: _pos.place,
+            icon: Object.assign(icon, {fillColor: '#66afe9'})
+        })
+    });
 
-    const markers = deals.map((_pos) => new google.maps.Marker({
+    let yellowMarkers = serviceDeals.map((_pos) => new google.maps.Marker({
         position: _pos.place,
-        icon: redMarker
+        icon: Object.assign(icon, {fillColor: '#fff300'})
     }));
 
+    let greenMarkers = plannedDeals.map((_pos) => new google.maps.Marker({
+        position: _pos.place,
+        icon: Object.assign(icon, {fillColor: '#00a74c'})
+    }));
+
+    markers.push(...blueMarkers, ...yellowMarkers, ...greenMarkers);
+
+    markers.forEach((marker) => {
+        let content;
+
+        marker.addListener('click', () => {
+
+            let position = marker.getPosition();
+
+            for (let deals of dealsMap.keys()) {
+                dealsMap.get(deals).forEach(el => {
+                    if (position.lat() === el.place.lat && position.lng() === el.place.lng) {
+                        console.log(`Маркеру присвоен контент ${el.title}`)
+                        content = el.title;
+                    }
+                })
+            }
+            console.log(content);
+            const infoWindow = new google.maps.InfoWindow({
+                content: content,
+            });
+            infoWindow.open(map, marker);
+        })
+    })
 
     console.log(markers);
 
@@ -100,7 +163,6 @@ async function initMap() {
             lng: avg[1] / markers.length,
         });
     }
-
 
     // Add a marker clusterer to manage the markers.
     const markerCluster = new MarkerClusterer(
