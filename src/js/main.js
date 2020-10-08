@@ -46,13 +46,10 @@ async function getCompanyTitle(id) {
                 id: id
             },
             function (result) {
-                if (result.error()) {
-                    return result.data({TITLE: 'Компании с указанным идентификатором не существует, либо она не указана в карточке сделки.'})
-                }
-                console.log(result.data());
-                result.data().forEach(el => {
-                    return result.data().TITLE
-                })
+                if (result.error())
+                    return resolve('Компании с указанным идентификатором не существует, либо она не указана в карточке сделки.');
+                else
+                    return resolve(result.data().TITLE);
             }
         )
     })
