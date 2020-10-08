@@ -38,6 +38,26 @@ function getPlaceFromDeal(str) {
     return new Place(Number(destination[0]), Number(destination[1]));
 }
 
+async function getCompanyTitle(id) {
+
+    return new Promise(resolve => {
+
+        BX24.callMethod("crm.company.get", {
+                id: id
+            },
+            function (result) {
+                if (result.error()) {
+                    return result.data({TITLE: 'Компании с указанным идентификатором не существует, либо она не указана в карточке сделки.'})
+                }
+                console.log(result.data());
+                result.data().forEach(el => {
+                    return result.data().TITLE
+                })
+            }
+        )
+    })
+}
+
 function getDeals() {
     const map = new Map([
         [FIRST_STAGE, []],
@@ -93,6 +113,9 @@ async function initMap() {
     };
 
     try {
+        // await getCompanyTitle('2');
+        let company = await getCompanyTitle('0');
+        console.log(company);
         dealsMap = await getDeals();
         newDeals = getCategoryOfDeals(FIRST_STAGE, dealsMap);
         serviceDeals = getCategoryOfDeals(SECOND_STAGE, dealsMap);
