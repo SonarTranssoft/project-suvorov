@@ -10,10 +10,10 @@ class Place {
 }
 
 class Deal {
-    constructor(id, stage, company_id, title, address, place, comments) {
+    constructor(id, stage, company, title, address, place, comments) {
         this.id = id;
         this.stage = stage;
-        this.company_id = company_id;
+        this.company = company;
         this.title = title;
         this.address = address;
         this.place = place;
@@ -89,7 +89,7 @@ function getDeals() {
                     let place = getPlaceFromDeal(el.UF_CRM_1598808869287);
 
                     let company = async function () {
-                        return await getCompanyTitle(el.COMPANY_ID);
+                        await getCompanyTitle(el.COMPANY_ID);
                     }
 
                     let address = getAddressFromDeal()
