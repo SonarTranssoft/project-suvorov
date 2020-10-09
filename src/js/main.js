@@ -10,10 +10,10 @@ class Place {
 }
 
 class Deal {
-    constructor(id, stage, company, title, address, place, comments) {
+    constructor(id, stage, company_id, title, address, place, comments) {
         this.id = id;
         this.stage = stage;
-        this.company = company;
+        this.company_id = company_id;
         this.title = title;
         this.address = address;
         this.place = place;
@@ -94,10 +94,6 @@ async function getDeals() {
                     //     return await getCompanyTitle(el.COMPANY_ID);
                     // }
 
-                    let company = async function() {
-                        return await getCompanyTitle(el.COMPANY_ID)
-                    }
-
                     let address = getAddressFromDeal(el.UF_CRM_1598808869287);
                     if (place) {
                         switch (el.STAGE_ID) {
@@ -111,7 +107,7 @@ async function getDeals() {
                                 el.STAGE_ID = 'Работы спланированы';
                                 break;
                         }
-                        let deal = new Deal(el.ID, el.STAGE_ID, company(), el.TITLE, address, place, el.COMMENTS);
+                        let deal = new Deal(el.ID, el.STAGE_ID, el.COMPANY_ID, el.TITLE, address, place, el.COMMENTS);
                         map.get(el.STAGE_ID).push(deal);
                     }
                 })
@@ -141,7 +137,16 @@ async function initMap() {
 
     try {
         dealsMap = await getDeals();
+
         let places = Array.from(dealsMap).reduce((res, cur) => res.concat(...cur[1]), []).map(deal => deal.place);
+
+        let companies = Array.from(dealsMap)
+            .reduce((res, cur) => {
+                res.concat(...cur[1])
+            }, [])
+            .map(deal => deal.company_id);
+
+        console.log('Список идентификаторов', companies);
         console.log('Массив локаций', places);
 
         places.map((place, index) => {
