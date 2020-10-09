@@ -1,6 +1,6 @@
-const FIRST_STAGE = 'NEW';
-const SECOND_STAGE = 'PREPARATION';
-const THIRD_STAGE = 'PREPAYMENT_INVOICE';
+const FIRST_STAGE = 'Новая сделка';
+const SECOND_STAGE = 'Сервис';
+const THIRD_STAGE = 'Работы спланированы';
 
 class Place {
     constructor(lat, long) {
@@ -52,16 +52,18 @@ async function getCompanyTitle(id) {
                 id: id
             },
             function (result) {
-                if (result.error())
+                if (result.error()) {
                     return resolve('Компании с указанным идентификатором не существует, либо она не указана в карточке сделки.');
-                else
-                    return resolve(result.data().TITLE);
+                } else {
+                    console.log('Название компании', result.data())
+                    return resolve(result.data());
+                }
             }
         )
     })
 }
 
-function getDeals() {
+async function getDeals() {
     const map = new Map([
         [FIRST_STAGE, []],
         [SECOND_STAGE, []],
@@ -88,11 +90,15 @@ function getDeals() {
                     //получаем координаты и подготавливаем для вывода на карту
                     let place = getPlaceFromDeal(el.UF_CRM_1598808869287);
 
-                    let company = async function () {
-                        await getCompanyTitle(el.COMPANY_ID);
+                    // let company = async function () {
+                    //     return await getCompanyTitle(el.COMPANY_ID);
+                    // }
+
+                    let company = async function() {
+                        return await getCompanyTitle(el.COMPANY_ID)
                     }
 
-                    let address = getAddressFromDeal()
+                    let address = getAddressFromDeal(el.UF_CRM_1598808869287);
                     if (place) {
                         switch (el.STAGE_ID) {
                             case "NEW":
@@ -105,7 +111,7 @@ function getDeals() {
                                 el.STAGE_ID = 'Работы спланированы';
                                 break;
                         }
-                        let deal = new Deal(el.ID, el.STAGE_ID, company, el.TITLE, address, place, el.COMMENTS);
+                        let deal = new Deal(el.ID, el.STAGE_ID, company(), el.TITLE, address, place, el.COMMENTS);
                         map.get(el.STAGE_ID).push(deal);
                     }
                 })
@@ -198,10 +204,10 @@ async function initMap() {
             for (let deals of dealsMap.keys()) {
                 dealsMap.get(deals).forEach(el => {
                     if (position.lat() === el.place.lat && position.lng() === el.place.lng) {
-                        content = `<div>Сделка: <span>${el.title}</span></div>
-                        <div>Компания: <span>${el.company}</span></div>
-                        <div>Тип сделки: <span>${el.stage}</span></div>
-                        <div>Адрес: <span>${el.address}</span> </div>`;
+                        content = `<div><b>Сделка:</b> <span>${el.title}</span></div>
+                        <div><b>Компания:</b> <span>${el.company}</span></div>
+                        <div><b> Тип сделки:</b> <span>${el.stage}</span></div>
+                        <div><b>Адрес:</b> <span>${el.address}</span> </div>`;
                     }
                 })
             }
