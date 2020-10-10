@@ -5,7 +5,16 @@ class Place {
     }
 }
 
-function getCoordinatesFromDeals() {
+class Deal {
+    constructor(id, stage, title, Place) {
+        this.id = id;
+        this.stage = stage;
+        this.title = title;
+        this.Place = new Place();
+    }
+}
+
+function getDeals() {
     const arr = [];
 
     return new Promise(res => {
@@ -14,7 +23,7 @@ function getCoordinatesFromDeals() {
             "crm.deal.list",
             {
                 order: {"STAGE_ID": "ASC"},
-                select: ["ID", "TITLE", "STAGE_ID", "PROBABILITY", "OPPORTUNITY", "CURRENCY_ID", "UF_*"]
+                select: ["ID", "TITLE", "STAGE_ID", "UF_*"]
             },
             function (result) {
                 if (result.error()) {
@@ -23,13 +32,14 @@ function getCoordinatesFromDeals() {
                 }
 
                 result.data().forEach(el => {
+                    //Получаем координаты и парсим их в числа
                     let dealIncompleteAddress = (el.UF_CRM_1598808869287);
                     let invalidCoordinates = dealIncompleteAddress.split('|');
                     let destination = invalidCoordinates[1].split(';');
-                    let place = new Place(parseFloat(destination[0]), parseFloat(destination[1]))
+                    let place = new Place(parseFloat(destination[0]), parseFloat(destination[1]));
+                    let deal = new Deal(1, 2, 'Привет свинья', place);
                     arr.push(place)
-                })
-
+                });
                 if (result.more()) {
                     result.next();
                 } else {
@@ -45,7 +55,7 @@ async function initMap() {
     let coordinates;
 
     try {
-        coordinates = await getCoordinatesFromDeals();
+        coordinates = await getDeals();
     } catch (e) {
         // тут обрабатываем ошибку #{1}
         return console.error(e);
