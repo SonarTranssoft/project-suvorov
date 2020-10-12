@@ -44,22 +44,32 @@ function getAddressFromDeal(str) {
     return str.substring(0, str.lastIndexOf('|')) || null;
 }
 
-async function getCompanyTitle(id) {
-
+async function getCompanyTitle(arr) {
+    let companies = {};
     return new Promise(resolve => {
 
-        BX24.callMethod("crm.company.get", {
-                id: id
+        BX24.callMethod("crm.company.list",
+            {
+                order: {'ID': 'ASC'},
+                filter: {'ID': arr},
+                select: ['ID', 'TITLE']
             },
             function (result) {
                 if (result.error()) {
-                    return resolve('Компании с указанным идентификатором не существует, либо она не указана в карточке сделки.');
+                    console.log(result.error)
+                }
+                result.data().forEach(el => {
+                    companies[el.ID] = el.TITLE;
+                    console.log(`Компания ${el.TITLE} с ID: ${el.ID}`);
+                });
+                if (result.more()) {
+                    result.next();
                 } else {
-                    console.log('Название компании', result.data())
-                    return resolve(result.data());
+                    console.log(companies);
                 }
             }
         )
+        return resolve(companies);
     })
 }
 
@@ -126,7 +136,7 @@ async function getDeals() {
 async function initMap() {
     const markers = [];
     let counter = 0;
-    let dealsMap, newDeals, serviceDeals, plannedDeals;
+    let dealsMap, newDeals, serviceDeals, plannedDeals, companyTitles;
     let icon = {
         path: "M16.734,0C9.375,0,3.408,5.966,3.408,13.325c0,11.076,13.326,20.143,13.326,20.143S30.06,23.734,30.06,13.324        " +
             "C30.06,5.965,24.093,0,16.734,0z M16.734,19.676c-3.51,0-6.354-2.844-6.354-6.352c0-3.508,2.844-6.352,6.354-6.352        " +
@@ -140,11 +150,18 @@ async function initMap() {
 
         let places = Array.from(dealsMap).reduce((res, cur) => res.concat(...cur[1]), []).map(deal => deal.place);
 
-        let companies = Array.from(dealsMap)
-            .reduce((res, cur) => res.concat(...cur[1]), [])
-            .map(deal => deal.company_id)
-            .reduce((res, cur) => res.includes(cur) ? res : res.concat(...cur), []);
+        const companies = Array.from(dealsMap)
+            .reduce((res, cur) => res.concat(cur[1]), [])
+            .reduce((res, cur) =>
+                    (cur.company_id === '0' || res.includes(cur.company_id))
+                        ? res
+                        : res.concat(cur.company_id)
+                , []);
 
+        companyTitles = await getCompanyTitle(companies);
+        companyTitles['0'] = 'Компания не указана'; //указываю для того, чтобы в инфоокнах было красиво указано отсутствие заполненной компании
+
+        console.log(`Компании с идентификаторами: ${companyTitles}`)
         console.log('Список идентификаторов', companies);
         console.log('Массив локаций', places);
 
@@ -172,6 +189,7 @@ async function initMap() {
             mapTypeId: 'hybrid'
         }
     );
+
 
     console.log(`На карте будет ${newDeals.length} новых сделок`);
     console.log(`На карте будет ${serviceDeals.length} сервисных сделок`);
@@ -208,9 +226,9 @@ async function initMap() {
             for (let deals of dealsMap.keys()) {
                 dealsMap.get(deals).forEach(el => {
                     if (position.lat() === el.place.lat && position.lng() === el.place.lng) {
-                        content = `<div><b>Сделка:</b> <span>${el.title}</span></div>
-                        <div><b>Компания:</b> <span>${el.company}</span></div>
-                        <div><b> Тип сделки:</b> <span>${el.stage}</span></div>
+                        content = `<div><b>Сделка:</b><a href='https://b24-rnkprp.bitrix24.com/crm/deal/details/${el.id}/' title="Перейти к деталям сделки" target="_blank"> <span>${el.title}</span></a></div>
+                        <div><b>Компания:</b> <span>${companyTitles[el.company_id]}</span></div>
+                        <div ><b> Тип сделки:</b> <span>${el.stage}</span></div>
                         <div><b>Адрес:</b> <span>${el.address}</span> </div>`;
                     }
                 })
