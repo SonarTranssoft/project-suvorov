@@ -83,7 +83,7 @@ async function getDeals() {
                     // выбрасываем ошибку #{1}
                     throw new Error(result.error())
                 }
-                console.log(result.data())
+                console.log(result.data());
 
                 result.data().forEach(el => {
                     console.log(el);
@@ -110,7 +110,7 @@ async function getDeals() {
                         let deal = new Deal(el.ID, el.STAGE_ID, el.COMPANY_ID, el.TITLE, address, place, el.COMMENTS);
                         map.get(el.STAGE_ID).push(deal);
                     }
-                })
+                });
 
                 if (result.more()) {
                     result.next();
@@ -141,10 +141,9 @@ async function initMap() {
         let places = Array.from(dealsMap).reduce((res, cur) => res.concat(...cur[1]), []).map(deal => deal.place);
 
         let companies = Array.from(dealsMap)
-            .reduce((res, cur) => {
-                res.concat(...cur[1])
-            }, [])
-            .map(deal => deal.company_id);
+            .reduce((res, cur) => res.concat(...cur[1]), [])
+            .map(deal => deal.company_id)
+            .reduce((res, cur) => res.includes(cur) ? res : res.concat(...cur), []);
 
         console.log('Список идентификаторов', companies);
         console.log('Массив локаций', places);
@@ -155,7 +154,7 @@ async function initMap() {
                 counter++;
                 places[i].lng = places[i].lng + (counter * 0.00009);
             }
-        })
+        });
 
         newDeals = getCategoryOfDeals(FIRST_STAGE, dealsMap);
         serviceDeals = getCategoryOfDeals(SECOND_STAGE, dealsMap);
